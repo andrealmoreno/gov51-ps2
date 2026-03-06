@@ -382,3 +382,34 @@ cat("Difference in post-period means (Study 2):", ate_s2, "\n")
 # the intervention, which is common when data is fabricated to produce 
 # more exciting or headline worthy results.
 
+#Q3.5
+#variance and n for each group 
+s2_uncertainty_stats <- s2_balance_data %>%
+  group_by(treatment) %>%
+  summarize(
+    var_therm2 = var(therm2, na.rm = TRUE),
+    n = n()
+  )
+
+#t values for the SE formula
+var_tr <- s2_uncertainty_stats$var_therm2[2]
+var_co <- s2_uncertainty_stats$var_therm2[1]
+n_tr   <- s2_uncertainty_stats$n[2]
+n_co   <- s2_uncertainty_stats$n[1]
+# SE
+se_diff <- sqrt((var_tr / n_tr) + (var_co / n_co))
+lower_ci <- ate_s2 - (1.96 * se_diff)
+upper_ci <- ate_s2 + (1.96 * se_diff)
+
+cat("Standard Error:", se_diff, "\n")
+cat("95% Confidence Interval: [", lower_ci, ",", upper_ci, "]\n")
+
+# answer
+#The 95% confidence interval for the difference in post-treatment means 
+#is [1.29, 5.84]. Since this interval does not include zero, we can 
+#conclude that the difference is statistically significant at the 5% level 
+#This confirms that while the "real" effect in Study 2 (3.57) 
+#is much smaller than the fabricated 10-point effect in study 1, the 
+#gay canvasser intervention still produced a measurable and statistically 
+# reliable increase in support for same-sex marriage.
+
