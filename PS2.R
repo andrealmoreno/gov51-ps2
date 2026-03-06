@@ -173,3 +173,33 @@ print(ccap_stats)
 # independently but was likely "sampled" or copied from the existing 
 # CCAP distribution to appear realistic.
 
+#Q2.3
+#create a combined data frame for plotting
+lacour_plot <- gay_reshaped %>%
+  filter(study == 1) %>%
+  select(therm = therm1) %>%
+  mutate(source = "LaCour Study 1 (therm1)")
+ccap_plot <- ccap %>%
+  select(therm = gaytherm) %>%
+  mutate(source = "CCAP 2012 (gaytherm)")
+combined_data <- bind_rows(lacour_plot, ccap_plot)
+#side-by-side histograms
+ggplot(combined_data, aes(x = therm)) +
+  geom_histogram(breaks = seq(0, 100, by = 5), 
+                 fill = "steelblue", 
+                 color = "white") +
+  facet_wrap(~source, scales = "free_y") +
+  labs(title = "Distribution of Baseline Feeling Thermometers",
+       x = "Feeling Thermometer Score (0-100)",
+       y = "Frequency") +
+  theme_minimal()
+#Answer -
+#These distributions do not look like they came from different populations. 
+#Despite being collected at different times from different groups, the 
+#histograms are nearly identical in shape and frequency of specific values. 
+# In a real-world experiment, we would expect more variation this  
+# level of similarity suggests the LaCour data was likely fabricated by 
+# copying the distribution of the existing CCAP survey.
+
+
+
