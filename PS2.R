@@ -82,3 +82,32 @@ ggplot(q1_2_results, aes(x = treatment, y = mean_ssm, fill = treatment)) +
        y = "Mean Support (1-5 scale)") +
   theme_minimal() +
   theme(legend.position = "none")
+
+#1.2 Checking Balance and Comparing Outcomes
+#Q1.5
+balance_check <- study1_wave1 %>%
+  filter(treatment %in% c("Same-Sex Marriage Script by Gay Canvasser", "No Contact")) %>%
+  group_by(treatment) %>%
+  summarize(
+    mean_ssm = mean(ssm, na.rm = TRUE),
+    sd_ssm = sd(ssm, na.rm = TRUE),
+    var_ssm = var(ssm, na.rm = TRUE) # Variance is s^2
+  )
+
+stats <- balance_check$mean_ssm
+vars <- balance_check$var_ssm
+
+std_diff <- (stats[2] - stats[1]) / sqrt((vars[2] + vars[1]) / 2)
+print(std_diff)
+# Answer - The standardized difference in means is -0.01, which is significantly 
+# lower than the 0.25 threshold. This indicates that the groups are 
+# very well-balanced at baseline. This is important 
+# because it ensures that any changes we see in later waves are 
+# likely due to the treatment (the canvassing) rather than 
+# pre-existing differences between the people in each group.
+
+
+
+
+
+
