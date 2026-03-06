@@ -327,5 +327,58 @@ ggplot(combined_studies, aes(x = therm)) +
 # heights of these heaps, suggesting it is an independent sample 
 # rather than a copied distribution.
 
+#3.2
+# Q3.3
+s2_balance_data <- gay_reshaped %>%
+  filter(study == 2, 
+         treatment %in% c("No Contact", "Same-Sex Marriage Script by Gay Canvasser"))
+#Mean, SD, and Variance for each group
+s2_balance_stats <- s2_balance_data %>%
+  group_by(treatment) %>%
+  summarize(
+    mean = mean(therm1, na.rm = TRUE),
+    sd = sd(therm1, na.rm = TRUE),
+    var = var(therm1, na.rm = TRUE)
+  )
 
+mean_tr_s2 <- s2_balance_stats$mean[2]
+mean_co_s2 <- s2_balance_stats$mean[1]
+var_tr_s2  <- s2_balance_stats$var[2]
+var_co_s2  <- s2_balance_stats$var[1]
+
+std_diff_s2 <- (mean_tr_s2 - mean_co_s2) / sqrt((var_tr_s2 + var_co_s2) / 2)
+
+
+print(s2_balance_stats)
+cat("Standardized Difference in Means (Study 2):", std_diff_s2, "\n")
+#answer
+#The standardized difference in means for Study 2 is approximately 0.05, 
+#which suggests that the treatment and control groups are well-balanced 
+#at baseline. Unlike the too-perfect balance often seen in fabricated 
+#data, this small but non-zero difference is exactly what we expect 
+#from a legitimate randomization process in a real-world experiment.
+
+#3.4
+#mean of therm2 for each group
+s2_post_stats <- s2_balance_data %>%
+  group_by(treatment) %>%
+  summarize(
+    mean_therm2 = mean(therm2, na.rm = TRUE),
+    n = n()
+  )
+
+#means to calculate the difference
+mean_tr_post <- s2_post_stats$mean_therm2[2]
+mean_co_post <- s2_post_stats$mean_therm2[1]
+#ATE
+ate_s2 <- mean_tr_post - mean_co_post
+print(s2_post_stats)
+cat("Difference in post-period means (Study 2):", ate_s2, "\n")
+# answer
+#In Study 2, the difference in post-treatment means is 3.57 points. 
+#While this indicates a positive effect from the gay canvasser script, 
+# it is notably smaller than the effect size reported in Study 1. This 
+# suggests that the original study inflated the impact of 
+# the intervention, which is common when data is fabricated to produce 
+# more exciting or headline worthy results.
 
