@@ -1,12 +1,10 @@
----
-title: "Problem Set 2: The LaCour-Green Study"
-author: "Andrea Moreno"
-date: "`r Sys.Date()`"
-output: pdf_document
----
-GitHub Repository:"https://github.com/andrealmoreno/gov51-ps2.git"
----
-#Part 1: The origin
+# ---
+# title: "Problem Set 2: The LaCour-Green Study"
+# author: "Andrea Moreno"
+# date: "2026-03-05"
+# output: pdf_document
+# ---
+# GitHub Repository: "https://github.com/andrealmoreno/gov51-ps2.git"t 1: The origin
 #Load data
 library(tidyverse)
 getwd() 
@@ -93,7 +91,6 @@ balance_check <- study1_wave1 %>%
     sd_ssm = sd(ssm, na.rm = TRUE),
     var_ssm = var(ssm, na.rm = TRUE) # Variance is s^2
   )
-
 stats <- balance_check$mean_ssm
 vars <- balance_check$var_ssm
 
@@ -413,3 +410,171 @@ cat("95% Confidence Interval: [", lower_ci, ",", upper_ci, "]\n")
 #gay canvasser intervention still produced a measurable and statistically 
 # reliable increase in support for same-sex marriage.
 
+#3.4
+#Q3.6
+
+s2_control_all_waves <- gay_reshaped %>% 
+  filter(study == 2, treatment == "No Contact")
+
+cor_w1_w2 <- cor(s2_control_all_waves$therm1, s2_control_all_waves$therm2, use = "complete.obs")
+cor_w1_w3 <- cor(s2_control_all_waves$therm1, s2_control_all_waves$therm3, use = "complete.obs")
+cor_w1_w4 <- cor(s2_control_all_waves$therm1, s2_control_all_waves$therm4, use = "complete.obs")
+
+cat("Correlation W1-W2:", cor_w1_w2, "\n")
+cat("Correlation W1-W3:", cor_w1_w3, "\n")
+cat("Correlation W1-W4:", cor_w1_w4, "\n")
+
+# answer
+# In Study 2, the correlations between the baseline and subsequent waves 
+# remain very high (above 0.95), but they show slight fluctuations over 
+# time rather than a perfectly linear decay. This pattern indicates that 
+# while individual attitudes toward same-sex marriage are remarkably 
+# stable, there is still natural variation and "noise" in how people 
+# respond across different months. Unlike study 1, where 
+# the consistency was too perfect, these results 
+# reflect the minor inconsistencies expected in real human survey 
+#responses.
+
+#3.7
+#Study 2 differs from Study 1 primarily in its noise and effect size while 
+#Study 1 reported a 10-point jump in support, Study 2 showed a more 
+#realistic 3.57-point increase. Additionally, study 1's 
+# baseline statistics were nearly identical to the CCAP survey (Mean 58.4 
+# vs 58.7), whereas study 2 showed a natural, independent distribution. 
+# It is vital that real treatment effects are smaller and messier because 
+# human behavior is complex and inconsistent "perfect" data often signals 
+# that measurement error and rounding—natural parts of social science
+# have been erased. Simple tools like histograms and 
+#correlations were the most effective at catching this fraud because 
+# they revealed the too perfect 0.998 re-test reliability and the 
+# lack of natural "heaping" variation in the fabricated study. 
+# Ultimately these basic descriptive statistics proved that if a result 
+#looks too good to be true, it likely is.
+
+#Part 4 
+#Q.4
+fit_s1 <- lm(therm2 ~ therm1, data = s1_control)
+summary(fit_s1)
+s1_summary <- summary(fit_s1)
+cat("Slope (Beta 1):", coef(fit_s1)[2], "\n")
+cat("R-squared:", s1_summary$r.squared, "\n")
+cat("Residual Standard Error:", s1_summary$sigma, "\n")
+#answer 
+#Slope 0.9924539
+#R-squared: 0.9951692
+#Residual standard error: 1.976158
+
+# Q4.2
+
+fit_s2 <- lm(therm2 ~ therm1, data = s2_control)
+summary(fit_s2)
+s2_summary <- summary(fit_s2)
+cat("Slope (Beta 1):", coef(fit_s2)[2], "\n")
+cat("R-squared:", s2_summary$r.squared, "\n")
+cat("Residual Standard Error:", s2_summary$sigma, "\n")
+#answer
+# In Study 2, the slope is 0.969 and the R-squared is 0.948, which 
+# are high but notably lower than the near-perfect 0.99 values found in 
+# study 1.the Residual Standard Error in Study 2 (6.55) is more than three 
+#times larger than in Study 1 
+# (1.98). This pattern represents a messier and more 
+# realistic scenario where individual opinions naturally fluctuate 
+# over time, whereas study 1 lacked the natural measurement error 
+# and regression to the mean found in authentic human surveys.
+
+#4.2
+#Q4.3
+s2_reg_data <- s2_balance_data %>%
+  mutate(treated = if_else(treatment == "Same-Sex Marriage Script by Gay Canvasser", 1, 0))
+
+fit_treatment <- lm(therm2 ~ treated, data = s2_reg_data)
+summary(fit_treatment)
+reg_summary <- summary(fit_treatment)
+beta_1 <- coef(fit_treatment)["treated"]
+se_beta1 <- reg_summary$coefficients["treated", "Std. Error"]
+t_stat <- reg_summary$coefficients["treated", "t value"]
+p_val <- reg_summary$coefficients["treated", "Pr(>|t|)"]
+
+cat("Beta 1 (Treatment Effect):", beta_1, "\n")
+cat("Standard Error:", se_beta1, "\n")
+cat("t-statistic:", t_stat, "\n")
+cat("p-value:", p_val, "\n")
+#answer
+#The regression yields a Beta 1 (slope) of 3.57, which is exactly the 
+# same as the difference in means calculated in Q3.4. 
+#What I noticed
+# I notice that Beta 1 (3.57) is exactly identical to the difference in post-period 
+# means calculated in Q3.4. This is because in a bivariate regression with a 
+# binary treatment variable, the coefficient represents the Average Treatment 
+#effect,
+# Beta 0 (the intercept, 57.64) estimates the mean of the "No Contact" control 
+# group (where treated = 0).
+#Statistical significance: 
+# With a p-value of 0.004, which is well below the alpha = 0.05 threshold, 
+# the difference between groups is statistically significant. This 
+# provides formal evidence that the gay canvasser script had a positive, 
+# non-random impact on attitudes in the replication study.
+
+#Q4.4
+fit_controlled <- lm(therm2 ~ treated + therm1, data = s2_reg_data)
+summary(fit_controlled)
+controlled_summary <- summary(fit_controlled)
+beta_1_adj <- coef(fit_controlled)["treated"]
+se_beta1_adj <- controlled_summary$coefficients["treated", "Std. Error"]
+t_stat_adj <- controlled_summary$coefficients["treated", "t value"]
+p_val_adj <- controlled_summary$coefficients["treated", "Pr(>|t|)"]
+
+cat("Adjusted Beta 1 (Treatment Effect):", beta_1_adj, "\n")
+cat("Adjusted Standard Error:", se_beta1_adj, "\n")
+cat("t-statistic:", t_stat_adj, "\n")
+cat("p-value:", p_val_adj, "\n")
+
+#answer
+#adjusted Beta 1 (Treatment Effect): 2.46
+#adjusted Standard Error: 0.34
+# t-statistic: 7.21
+# p-value: 7.76e-13
+#
+#(a) The estimate of Beta 1 changed from 3.57 to 2.46. While the direction 
+# and significance remained the same, the point estimate shifted slightly 
+# once we accounted for individual baseline attitudes.
+#
+#(b) The standard error decreased dramatically, dropping from 1.24 in 
+# Q4.3 to 0.34 in this model.
+#
+#(c) Controlling for baseline attitudes improves precision because therm1 
+# is a very strong predictor of therm2 (as seen by the high R-squared of 0.925). 
+# By explaining most of the variation in the outcome, the model reduces 
+# the unexplained noise (residuals), allowing us to estimate the 
+# treatment effect with much greater certainty.
+
+#q4.5
+rsquared_simple <- summary(fit_treatment)$r.squared
+rsquared_controlled <- summary(fit_controlled)$r.squared
+
+cat("R-squared (Simple):", rsquared_simple, "\n")
+cat("R-squared (Controlled):", rsquared_controlled, "\n")
+
+hypothetical_data <- data.frame(
+  treated = c(1, 0),
+  therm1 = c(50, 50)
+)
+
+predictions <- predict(fit_controlled, newdata = hypothetical_data)
+
+cat("Predicted Person A (Treated, 50 baseline):", predictions[1], "\n")
+cat("Predicted Person B (Control, 50 baseline):", predictions[2], "\n")
+cat("Predicted Difference:", predictions[1] - predictions[2], "\n")
+
+#answer
+#Adding therm1 increases the R-squared so dramatically (from 0.004 to 0.925) 
+#because baseline attitudes are the strongest predictor of future attitudes. 
+#While the treatment has a statistically significant effect, it only explains 
+#a tiny fraction of the overall variation in Wave 2 (less than 1%); the 
+#vast majority of where someone ends up is determined by where they started.
+# Predicted difference:
+#For Person A (Treated), the predicted Wave 2 score is 52.48.
+#For Person B (Control), the predicted Wave 2 score is 50.02.
+# The predicted difference is 2.46, which is exactly our Beta 1 coefficient 
+# from the controlled model. This shows that the treatment effect represents 
+# the expected boost a person receives, regardless of their starting baseline.
