@@ -272,4 +272,60 @@ ggplot(combined_controls, aes(x = therm1, y = therm2)) +
 # noise, they created an illusion of high-quality data that could pass 
 # a surface-level check but failed under forensic scrutiny.
 
+#Part 3
+#Q3.1
+
+study2_data <- gay_reshaped %>%
+  filter(study == 2)
+nrow(study2_data)
+
+study2_baseline_stats <- study2_data %>%
+  group_by(treatment) %>%
+  summarize(
+    mean_therm1 = mean(therm1, na.rm = TRUE),
+    sd_therm1 = sd(therm1, na.rm = TRUE),
+    n = n()
+  )
+
+print(study2_baseline_stats)
+#answer
+#study 2 contains 2,441 observations. The baseline means for the 
+#"No Contact" group (57.9) and the "Gay Canvasser" group (59.4) 
+# are relatively close, suggesting that randomization successfully 
+# balanced the groups, though they are not suspiciously identical.
+
+#Q3.2
+s1_plot_data <- gay_reshaped %>%
+  filter(study == 1) %>%
+  select(therm = therm1) %>%
+  mutate(source = "Study 1 (LaCour)")
+
+s2_plot_data <- gay_reshaped %>%
+  filter(study == 2) %>%
+  select(therm = therm1) %>%
+  mutate(source = "Study 2 (Replication)")
+
+combined_studies <- bind_rows(s1_plot_data, s2_plot_data)
+#histogramss
+ggplot(combined_studies, aes(x = therm)) +
+  geom_histogram(breaks = seq(0, 100, by = 5), 
+                 fill = "darkgreen", 
+                 color = "white") +
+  facet_wrap(~source, scales = "free_y") +
+  labs(title = "Baseline Distribution Comparison: Study 1 vs Study 2",
+       x = "Feeling Thermometer Score (0-100)",
+       y = "Frequency") +
+  theme_minimal()
+
+#answer 
+#Visually both Study 1 and 2 show "heaping" (spikes) at the 
+# values of 0, 50, and 100, which is typical for feeling thermometers 
+#where respondents round to neutral or extreme values. 
+#However, study 1 is a suspiciously perfect match to the national 
+# CCAP distribution. Study 2, while similar in its 
+# overall range, shows more natural "noise" and variation in the 
+# heights of these heaps, suggesting it is an independent sample 
+# rather than a copied distribution.
+
+
 
