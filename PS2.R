@@ -106,8 +106,70 @@ print(std_diff)
 # likely due to the treatment (the canvassing) rather than 
 # pre-existing differences between the people in each group.
 
+#Q1.6
 
+study1_wave2 <- gay %>%
+  filter(study == 1, wave == 2)
+#calculate the mean ssm for the two groups
+q1_6_results <- study1_wave2 %>%
+  filter(treatment %in% c("Same-Sex Marriage Script by Gay Canvasser", "No Contact")) %>%
+  group_by(treatment) %>%
+  summarize(mean_ssm = mean(ssm, na.rm = TRUE))
+print(q1_6_results)
+diff_means_w2 <- q1_6_results$mean_ssm[2] - q1_6_results$mean_ssm[1]
+print(diff_means_w2)
 
+#Answer
+# The difference in means at Wave 2 is approximately 0.10. 
+# Since we established in Q1.5 that these groups were balanced at baseline, 
+# this difference suggests that the 'same-Sex marriage Script' delivered 
+# by a gay canvasser successfully increased support for same-sex marriage. 
+# Because the study used a randomized design, we can attribute this increase 
+# to the treatment effect of the conversation rather than pre-existing differences.
 
+# Part 2 The Forensic Discovery
+#Q.2.1
+# observations and column names for gayreshaped.csv
+nrow(gay_reshaped)
+colnames(gay_reshaped)
+# observations and column names for ccap2012.csv
+nrow(ccap)
+colnames(ccap)
+# Answer
+# gayreshaped.csv has 11,948 observations. 
+# Its columns are: "study", "treatment", "therm1", "therm2", "therm3", "therm4".
+# ccap2012.csv has 43,998 observations. 
+# Its columns are: "...1" (index), "caseid", and "gaytherm".
 
+#Q2.2
+#Filter Study 1 from gayreshaped and calculate stats for therm1
+gay_s1_stats <- gay_reshaped %>%
+  filter(study == 1) %>%
+  summarize(
+    mean = mean(therm1, na.rm = TRUE),
+    median = median(therm1, na.rm = TRUE),
+    sd = sd(therm1, na.rm = TRUE)
+  )
+
+#calculate stats for gaytherm 
+ccap_stats <- ccap %>%
+  summarize(
+    mean = mean(gaytherm, na.rm = TRUE),
+    median = median(gaytherm, na.rm = TRUE),
+    sd = sd(gaytherm, na.rm = TRUE)
+  )
+
+#side by side
+print("LaCour Study 1 (therm1) Statistics:")
+print(gay_s1_stats)
+print("CCAP 2012 (gaytherm) Statistics:")
+print(ccap_stats)
+
+# Answer - what i notice
+# I notice that the mean (58.4 vs 58.7), median (52 vs 54), and standard 
+# deviation (28.5 vs 29.4) are almost identical between the LaCour Study 1 
+# and the CCAP 2012 survey. This is highly suspicious for a randomized 
+# experiment, as it suggests the experimental data was not collected 
+# independently but was likely "sampled" or copied from the existing 
+# CCAP distribution to appear realistic.
 
