@@ -229,10 +229,47 @@ print(results_2_4)
 # small amount of random noise, rather than actually re-surveying real people 
 # whose opinions naturally fluctuate more than that.
 
+#Q2.5
+#combine the control groups 
+combined_controls <- bind_rows(
+  s1_control %>% mutate(label = "Study 1 (Control)"),
+  s2_control %>% mutate(label = "Study 2 (Control)")
+)
 
+#side-by-side scatter plots
+ggplot(combined_controls, aes(x = therm1, y = therm2)) +
+  geom_point(alpha = 0.5) +
+  # Add a 45-degree line (y = x)
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+  facet_wrap(~label) +
+  labs(title = "Wave 1 vs Wave 2 Feeling Thermometers",
+       subtitle = "Red dashed line indicates no change (y = x)",
+       x = "Wave 1 Score",
+       y = "Wave 2 Score") +
+  theme_minimal()
 
+# Answer
+#Study 2 looks much more like real data because the points form a 
+#distinct cloud around the 45-degree line, representing natural human 
+#inconsistency and minor shifts in opinion. Study 1 shows 
+#almost zero deviation from the 45-degree line. This lack of any noise or 
+#measurement error suggests the data was mathematically generated rather than 
+#collected from real people, as human respondents would never be this 
+#perfectly consistent over multiple weeks.
 
-
-
+#2.3 
+# Q2.6 
+#The combination of these three irregularities provides evidence of 
+#data fabrication. First, the baseline "therm1" statistics (Mean: 58.4, SD: 28.5) 
+#almost perfectly match the independent CCAP 2012 survey (Mean: 58.7, SD: 29.4), 
+#which is statistically impossible for a new, independent sample. Second, the 
+#re-test correlation of 0.998 in Study 1 is far above the plausible human 
+#reliability range of 0.95–0.97. Third, the tiny SD of within-person change (1.99) 
+#shows a lack of natural human "noise" or rounding variation over time. 
+#A fabricator likely produced data with these properties because they 
+# wanted the results to look clean and authoritative by copying a 
+# real-world distribution (CCAP) and adding a minute amount of random 
+# noise, they created an illusion of high-quality data that could pass 
+# a surface-level check but failed under forensic scrutiny.
 
 
